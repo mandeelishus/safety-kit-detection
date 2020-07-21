@@ -32,7 +32,7 @@ class PersonDetect(Model_X):
             # select coords based on confidence threshold
             coords = self.preprocess_output(outputs)
             
-            self.logger.info("cropped face: {0}".format(coords))
+            self.logger.info("cropped Person: {0}".format(coords))
             return self.crop_output(coords,image)
 
     def crop_output(self, coords, image):
@@ -49,7 +49,7 @@ class PersonDetect(Model_X):
             ymax = int(y2 * height)
             image = image[ymin:ymax,xmin:xmax]
             #cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-            #cv2.imwrite("ComputerPointerWindow.jpg", image)
+            
             #out_coord.append([xmin,ymin,xmax,ymax])
         return image
 
