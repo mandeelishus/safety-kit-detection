@@ -64,6 +64,41 @@ class Model_X:
 
         return 
 
+    def exec_net(self, request_id, p_image, infer_handle)
+        '''
+        start asynchronous inference for specificed request.
+        :param request_id :index of infer request value. Limited to device capabilities.
+        :return: Instance of Executable Network class
+        '''
+        # start asynchronous inference for specified request
+        if infer_handle == "async":
+            return self.net.start_async(request_id=request_id,inputs=p_image)
+
+        # start synchronous inference for specified request
+        elif infer_handle == "sync":
+            return self.net.infer(inputs=p_image)
+
+    def wait(self, request_id):
+        """
+        Waits for the result to become available.
+        :param request_id: Index of Infer request value. Limited to device capabilities.
+        :return: Timeout value
+        """
+        return self.net.requests[request_id].wait(-1)
+
+    def get_output(self, request_id, output=None):
+        """
+        Gives a list of results for the output layer of the network.
+        :param request_id: Index of Infer request value. Limited to device capabilities.
+        :param output: Name of the output layer
+        :return: Results for the specified request
+        """
+        if output:
+            result = self.exec_net(request_id, p_image, infer_handle).outputs[output]
+        else:
+            result = self.net.requests[request_id].outputs[self.output_name]
+        return result
+
     def preprocess_input(self, image):
         '''
         Before feeding the data into the model for inference,
