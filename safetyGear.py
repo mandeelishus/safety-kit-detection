@@ -9,7 +9,7 @@ class GearDetect(Model_X):
     '''
     Safety gear detection model class
     '''
-    def __init__(self, model_name, device, extensions, request_id, frame, infer_handle):
+    def __init__(self, model_name, device, extensions, request_id, frame, infer_handle, output=None):
         super().__init__(model_name, device, extensions)
 
 
@@ -22,21 +22,11 @@ class GearDetect(Model_X):
         
         p_image = self.preprocess_input(image)
 
-        
         # start inference for specified request
         result = self.exec_net(request_id, p_image, infer_handle)
-        
-        # wait for the result
-        if self.wait(request_id) == 0
-            # get the output of the inference
-            self.logger.info('waiting for output of inference')
-            result = self.get_output(request_id)
 
-            # select coords based on confidence threshold
-            return self.preprocess_output(result)
-            # self.logger.info("Return coords and the cropped Face"
-
-    def 
+        # select coords based on confidence threshold
+        return self.preprocess_output(result)
 
     def preprocess_output(self, result)
         '''
