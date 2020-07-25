@@ -72,11 +72,17 @@ class Model_X:
         '''
         # start asynchronous inference for specified request
         if infer_handle == "async":
-            return self.net.start_async(request_id=request_id,inputs=p_image)
+            self.net.start_async(request_id=request_id,inputs=p_image)
 
         # start synchronous inference for specified request
         elif infer_handle == "sync":
-            return self.net.infer(inputs=p_image)
+            self.net.infer(inputs=p_image)
+
+        # wait for the result
+        if self.wait(request_id) == 0
+            # get the output of the inference
+            self.logger.info('waiting for output of inference')
+            return self.get_output(request_id)
 
     def wait(self, request_id):
         """
