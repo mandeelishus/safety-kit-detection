@@ -50,9 +50,11 @@ class FaceDetection(Model_X):
             xmax = int(x2 * width)
             ymax = int(y2 * height)
             image = image[ymin:ymax,xmin:xmax]
+            
             #cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
             #cv2.imwrite("ComputerPointerWindow.jpg", image)
             #out_coord.append([xmin,ymin,xmax,ymax])
+            
         return image
 
     def preprocess_output(self, outputs):

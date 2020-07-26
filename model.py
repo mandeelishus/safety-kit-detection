@@ -64,7 +64,7 @@ class Model_X:
 
         return 
 
-    def exec_net(self, request_id, p_image, infer_handle)
+    def exec_net(self, request_id, p_image, infer_handle):
         '''
         start asynchronous inference for specificed request.
         :param request_id :index of infer request value. Limited to device capabilities.
@@ -79,7 +79,7 @@ class Model_X:
             self.net.infer(inputs=p_image)
 
         # wait for the result
-        if self.wait(request_id) == 0
+        if self.wait(request_id) == 0:
             # get the output of the inference
             self.logger.info('waiting for output of inference')
             return self.get_output(request_id)
