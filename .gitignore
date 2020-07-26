@@ -1,8 +1,0 @@
-models/
-main.py
-__pycache__/
-*.jpg
-deploy.prototxt
-face_mask.caffemodel
-mouseController.log
-*.mp4
