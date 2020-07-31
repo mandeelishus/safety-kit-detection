@@ -46,7 +46,7 @@ def get_args():
 
 def writePerformanceStats(args,model_stats_txt,model_inference_time,model_fps,model_load_time):
     '''
-    This function writes perfomance status of of each model used to a txt file.
+    This function writes perfomance status of each model used to a txt file.
 
     :param arg:
     :param model_stats_txt: 
@@ -61,7 +61,7 @@ def writePerformanceStats(args,model_stats_txt,model_inference_time,model_fps,mo
 
 def pipelines(args):
     '''
-    This function writes perfomance status of of each model used to a txt file.
+    This function writes perfomance status of each model used to a txt file.
     '''
     # enable logging for the function
     logger = logging.getLogger(__name__)
