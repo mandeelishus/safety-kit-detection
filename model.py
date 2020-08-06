@@ -111,7 +111,11 @@ class Model_X:
         you might have to preprocess it. This function is where you can do that.
         '''
         dsize = (self.input_shape[3], self.input_shape[2])
-        image = cv2.resize(image,(dsize))
-        image = image.transpose((2,0,1))
-        image = image.reshape(1,*image.shape)
-        return image
+        curr_image=image
+        try:
+            curr_image = cv2.resize(image,(dsize))
+            curr_image = curr_image.transpose((2,0,1))
+            curr_image = curr_image.reshape(1,*curr_image.shape)
+        except Exception as e:
+            print(str(e))
+        return curr_image

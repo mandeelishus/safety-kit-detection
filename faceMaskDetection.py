@@ -21,7 +21,8 @@ class MaskDetection(Model_X):
         
         p_image = self.preprocess_input(image)
         # start asynchronous inference for specified request
-        self.net.start_async(request_id=0, inputs={self.input_name: p_image})
+        if p_image.shape[0] is not None and p_image.shape[1] is not None and p_image.shape[2] is not None:
+            self.net.start_async(request_id=0, inputs={self.input_name: p_image})
         
         # wait for the result
         if self.net.requests[0].wait(-1) == 0:
