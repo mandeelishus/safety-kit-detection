@@ -21,7 +21,7 @@ class FaceDetection(Model_X):
         
         p_image = self.preprocess_input(image)
         # start synchronous inference for specified request
-        self.net.infer({self.input_name: p_image})
+        self.net.start_async(request_id=0, inputs={self.input_name: p_image})
         
         # wait for the result
         if self.net.requests[0].wait(-1) == 0:
@@ -29,11 +29,14 @@ class FaceDetection(Model_X):
             self.logger.info("Waiting for output of inference")
             outputs=self.net.requests[0].outputs[self.output_name]
 
-            return self.crop_output(outputs,image)
-
+            #return self.crop_output(outputs,image)
+            return self.preprocess_output(outputs)
+    
+    '''
     def crop_output(self, outputs, image):
         height = image.shape[0]
         width = image.shape[1]
+        coords=[]
         for box in outputs[0][0]:
             conf = box[2]
             if conf > 0.5:    
@@ -43,6 +46,17 @@ class FaceDetection(Model_X):
                 ymax = int(box[6] * height)
                 #cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
                 #cv2.imwrite("facesdetected.jpg", image)
-                images = image[ymin:ymax,xmin:xmax]  
+                coords=[xmin,ymin,xmax,ymax]
+                image = image[ymin:ymax,xmin:xmax]  
             
-        return images
+        return image, coords
+    '''
+    def preprocess_output(self,outputs):
+        flag = False
+        coords = []
+        for box in outputs[0][0]:
+            conf = box[2]
+            if conf > 0.5:
+                flag = True
+                coords.append(box[3:])
+        return coords, flag

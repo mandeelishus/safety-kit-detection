@@ -21,7 +21,7 @@ class MaskDetection(Model_X):
         
         p_image = self.preprocess_input(image)
         # start asynchronous inference for specified request
-        if p_image.shape[0] is not None and p_image.shape[1] is not None and p_image.shape[2] is not None:
+        if p_image.shape[0] is not 0 and p_image.shape[1] is not 0 and p_image.shape[2] is not 0:
             self.net.start_async(request_id=0, inputs={self.input_name: p_image})
         
         # wait for the result
@@ -29,12 +29,10 @@ class MaskDetection(Model_X):
             # get the output of the inference
             self.logger.info("Waiting for output of inference")
             outputs=self.net.requests[0].outputs[self.output_name]
-            print(self.preprocess_output(outputs))
-            # select coords based on confidence threshold
-        #    coords = self.preprocess_output(outputs)
+            
             
             self.logger.info("cropped Person: {0}".format(outputs))
-            return outputs
+            return self.preprocess_output(outputs)
 
     def preprocess_output(self, outputs):
         '''

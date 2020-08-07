@@ -12,6 +12,7 @@ import os
 
 CPU_EXTENSION="/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
 performance_directory_path="../"
+logging.basicConfig(filename='safety.log', level=logging.DEBUG)
 
 def get_args():
     '''
@@ -25,15 +26,17 @@ def get_args():
     optional = parser.add_argument_group('optional arguments')
 
     # --create the arguments
-    optional.add_argument("-m_f", help="path to face detection model", default=None)
-    optional.add_argument("-m_m", help="path to mask detection model", default=None)
-    optional.add_argument("-m_p", help="path to person detection model", default=None)
-    optional.add_argument("-m_g", help="path to safety gear detection model", default=None)
+    optional.add_argument("-m_f", help="path to face detection model", default='./models/face-detection-adas-binary-0001')
+    optional.add_argument("-m_m", help="path to mask detection model", default='./models/face_mask')
+    optional.add_argument("-m_p", help="path to person detection model", default='./models/person_model_88')
+ #   optional.add_argument("-m_g", help="path to safety gear detection model", default=None)
 
+    '''
     required.add_argument("-m_f",help="path to face detection model", required=True)
     required.add_argument("-m_m",help="path to mask detection model", required=True)
     required.add_argument("-m_p",help="path to person detection model", required=True)
     required.add_argument("-m_g",help="path to safety gear detection model", required=True)
+    '''
     required.add_argument("-i", help="path to video/image file or 'cam' for webcam", required=True)
 
     optional.add_argument("-l", help="MKLDNN (CPU)-targeted custom layers.", default=CPU_EXTENSION, required=False)
@@ -44,37 +47,23 @@ def get_args():
     args = parser.parse_args()
     return args
 
-def writePerformanceStats(args,model_stats_txt,model_inference_time,model_fps,model_load_time):
-    '''
-    This function writes perfomance status of each model used to a txt file.
-
-    :param arg:
-    :param model_stats_txt: 
-    :param  : 
-    :param  : 
-    '''
-    with open(os.path.join(performance_directory_path+args.p, model_stats_txt), 'w') as f:
-                f.write(str(model_inference_time)+'\n')
-                f.write(str(model_fps)+'\n')
-                f.write(str(model_load_time)+'\n')
-
-
 def pipelines(args):
     '''
     This function writes perfomance status of each model used to a txt file.
     '''
     # enable logging for the function
     logger = logging.getLogger(__name__)
+
+    
     
     # grab the parsed parameters
     faceDetectionModel=args.m_f
     maskDetectionModel=args.m_m
     personDetectionModel=args.m_p
-    gearDetectionModel=args.m_g
+  #  gearDetectionModel=args.m_g
     device=args.d
     customLayers=args.l
     inputFile=args.i
-    visualization_flag = args.vf
 
         # initialize feed
     single_image_format = ['jpg','tif','png','jpeg', 'bmp']
@@ -85,88 +74,109 @@ def pipelines(args):
     else:
         feed = InputFeeder('video',inputFile)
 
+    # Create a video writer for the output video
+    # The second argument should be `cv2.VideoWriter_fourcc('M','J','P','G')`
+    # on Mac, and `0x00000021` on Linux
+    out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920,1080))    
+    
     # load feed data
     feed.load_data()
 
-        # initialize and load the models
-    start_face_model_load_time = time.time()
+    # initialize and load the models
+    ## load the face detection model 
     faceDetectionPipeline=FaceDetection(faceDetectionModel, device, customLayers)
     faceDetectionPipeline.load_model()
-    face_model_load_time = time.time() - start_face_model_load_time
 
-    start_mask_model_load_time = time.time()
+    # load the face mask model
     maskDetectionPipeline=MaskDetection(maskDetectionModel, device, customLayers)
     maskDetectionPipeline.load_model()
-    mask_model_load_time = time.time() - start_mask_model_load_time
-    
-    start_person_model_load_time = time.time()
+
+    # load the person detection model
     personDetectionPipeline=PersonDetect(personDetectionModel, device, customLayers)
     personDetectionPipeline.load_model()
-    person_model_load_time = time.time() - start_person_model_load_time
+
+    # load the hard hat and safety jacket    
+    #gearDetectionPipeline=GearDetect(gearDetectionModel, device, customLayers)
+    #gearDetectionPipeline.load_model()
     
-    start_gear_model_load_time = time.time()
-    gearDetectionPipeline=GearDetect(gearDetectionModel, device, customLayers)
-    gearDetectionPipeline.load_model()
-    gear_model_load_time = time.time() - start_gear_model_load_time
 
      # set framecount, request_id, infer_handle variables
     frameCount = 0
-    request_id = 0
-    infer_async = "async"
-    infer_sync = "sync"
+
     # collate frames from the feeder and feed into the detection pipelines
     for _, frame in feed.next_batch():
-
         if not _:
             break
         frameCount+=1
-        #if frameCount%5==0:
-            #cv2.imshow('video', cv2.resize(frame,(500,500)))
-
+        
+        # wait before interrupting on keyboard event
         key = cv2.waitKey(60)
 
-        start_person_inference_time = time.time()
-        croppedperson = personDetectionPipeline.predict(frame)
-        person_inference_time = time.time() - start_person_inference_time
+        height = frame.shape[0]
+        width = frame.shape[1]
 
-        if 'm_p' in visualization_flag:
-            cv2.imshow('cropped person', croppedperson)
-
-        if type(croppedperson)==int:
-            logger.info("no person detected")
-            if key==27:
-                break
-            continue
-
-        start_gear_inference_time = time.time()
-        vest_detect, helment_detect, person = gearDetectionPipeline.predict(croppedperson.copy(), request_id, infer_sync)
-        gear_inference_time = time.time() - start_gear_inference_time
-
-        if 'm_g' in visualization_flag:
-            cv2.imshow('gear output', person)
-            # cv2.putText()
-
-        start_face_inference_time = time.time()
-        face coord, f_image=faceDetectionPipeline.predict(croppedperson.copy())   
-        face_inference_time = time.time() - start_face_inference_time
-
-        if 'm_f' in visualization_flag:
-            # cv2.imshow('face', f_image)
-
-        start_mask_inference_time = time.time()
-        mask_detect = maskDetectionPipeline.predict(f_image)
-        mask_inference_time = time.time() - start_mask_inference_time
-
-        if 'm_m' in visualization_flag:
-            cv2.imshow('mask', person)
-            # cv2.putText()
+        # start person detection
+        personCoords, personFlag = personDetectionPipeline.predict(frame.copy())
         
+        # break, if no person is in view
+        if personFlag ==True:
+            logger.info("Person detected")
+            
+            # Use the coordinates from personCoords to crop the person
+            # personCoords is an array with the indexes giving x0,y0,x1,y1 respectively
+            
+
+
+            # feed the cropped person into the hard hat and safety vest model i.e. GearDetect
+             
+
+            # check if the coords gotten from the hard hat and safety vest model, i.e. GearDetect, is empty 
+            # as a means to check if someone is present with a hard hat or safety vest
+            
+                # if someone is with a safety kit, normalize the coords from the hard hat and safety vest model i.e. GearDetect 
+                # to that of the frame
+
+
+                # draw the coordinates of the kit on the person
+            
+            # draw the coordinates of the individual around the individual on the frame
+            # and label the person's compliance with either hard hat or vest
+
+            
+        faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
+        if faceFlag ==True:
+            for _ in faceCoords:
+                x0,y0,x1,y1=_
+
+                xmin = int(x0 * width)
+                ymin = int(y0 * height)
+                xmax = int(x1 * width)
+                ymax = int(y1 * height)
+                
+                croppedFace = frame[ymin:ymax,xmin:xmax]
+                # output frame for showing inferencing results 
+                #out_cv = frame.copy()
+
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                mask_detect = maskDetectionPipeline.predict(croppedFace)
+            
+                if mask_detect <0:                    
+                    cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
+                elif mask_detect > 0:
+                    cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+        
+        cv2.imshow('mask', frame)
+        #out.write(frame)
         if key==27:
             break
-            
+    
+    
+    
     logger.info("The End")
     cv2.destroyAllWindows()
+    out.release()
     feed.close()
+    
 
 def main():
     args=get_args()

@@ -7,3 +7,6 @@ face_mask.caffemodel
 mouseController.log
 *.mp4
 .ipynb_checkpoints
+main_nnamdi.py
+main1.py
+safety.log

@@ -38,8 +38,8 @@ class GearDetect(Model_X):
         width = frame.shape[1]
         
         # filter output based on confidence threshold
-        vest_detect_coord = []
-        helment_detect_coord = []
+        hat_coords = []
+        vest_coords = []
 
         for box in result[0][0]:
 
@@ -53,8 +53,8 @@ class GearDetect(Model_X):
                     ymin_v = int(box[4] * height)
                     xmax_v = int(box[5] * width)
                     ymax_v = int(box[6] * height)
-
-                    vest_detect_coord.append([xmin_v,ymin_v,xmax_v,ymax_v])
+                    cv2.rectangle(frame, (xmin_v , ymin_v), (xmax_v , ymax_v), (0, 255, 0), 2)
+                    vest_coords.append(box[3:])
 
                 # Detect helment
                 if int(box[1]) == 4:
@@ -63,10 +63,7 @@ class GearDetect(Model_X):
                     ymin_h = int(box[4] * height)
                     xmax_h = int(box[5] * width)
                     ymax_h = int(box[6] * height)
-
-                    helment_detect_coord.append([xmin_h,ymin_h,xmax_h,ymax_h])  
-
-            for vest, helment in  (vest_detect_coord, helment_detect_coord):
-                cv2.rectangle(frame, (vest[0] , vest[1]), (vest[2] , vest[3]), (0, 255, 0), 2)
-                cv2.rectangle(frame, (helment[0] , helment[1]), (helment[2] , helment[3]), (0, 255, 0), 2)
-        return (vest_detect_coord, helment_detect_coord, frame)          
+                    cv2.rectangle(frame, (xmin_h , ymin_h), (xmax_h , ymax_h), (0, 255, 0), 2)
+                    hat_coords.append(box[3:])
+        
+        return vest_coords, hat_coords
