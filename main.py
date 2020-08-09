@@ -142,8 +142,10 @@ def pipelines(args):
             # draw the coordinates of the individual around the individual on the frame
             # and label the person's compliance with either hard hat or vest
 
-            
+        # send the frame to the face detection pipeline
         faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
+        # if there is a face, obtain the coordinates of the face and send the face
+        # to the mask detection pipeline
         if faceFlag ==True:
             for _ in faceCoords:
                 x0,y0,x1,y1=_
@@ -157,6 +159,7 @@ def pipelines(args):
                 # output frame for showing inferencing results 
                 #out_cv = frame.copy()
 
+                # draw outlines of the face
                 cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
                 mask_detect = maskDetectionPipeline.predict(croppedFace)
             
@@ -165,6 +168,7 @@ def pipelines(args):
                 elif mask_detect > 0:
                     cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
         
+        # visualize the video 
         cv2.imshow('mask', frame)
         #out.write(frame)
         if key==27:
