@@ -186,6 +186,7 @@ def pipelines(args):
                         if vest_flag == True and helment_flag == True:
                             cv2.putText(frame,"Full gear compliance", (xmin -10, ymin-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
 
+<<<<<<< HEAD
             
         # faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
         # if faceFlag ==True:
@@ -196,19 +197,54 @@ def pipelines(args):
         #         ymin = int(y0 * height)
         #         xmax = int(x1 * width)
         #         ymax = int(y1 * height)
+||||||| merged common ancestors
+            
+        faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
+        if faceFlag ==True:
+            for _ in faceCoords:
+                x0,y0,x1,y1=_
+
+                xmin = int(x0 * width)
+                ymin = int(y0 * height)
+                xmax = int(x1 * width)
+                ymax = int(y1 * height)
+=======
+        # send the frame to the face detection pipeline
+        faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
+        # if there is a face, obtain the coordinates of the face and send the face
+        # to the mask detection pipeline
+        if faceFlag ==True:
+            for _ in faceCoords:
+                x0,y0,x1,y1=_
+
+                xmin = int(x0 * width)
+                ymin = int(y0 * height)
+                xmax = int(x1 * width)
+                ymax = int(y1 * height)
+>>>>>>> 5008b19125b36e21824b8ef3e42ef5719e70e82c
                 
         #         croppedFace = frame[ymin:ymax,xmin:xmax]
         #         # output frame for showing inferencing results 
         #         #out_cv = frame.copy()
 
+<<<<<<< HEAD
         #         cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
         #         mask_detect = maskDetectionPipeline.predict(croppedFace)
+||||||| merged common ancestors
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                mask_detect = maskDetectionPipeline.predict(croppedFace)
+=======
+                # draw outlines of the face
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                mask_detect = maskDetectionPipeline.predict(croppedFace)
+>>>>>>> 5008b19125b36e21824b8ef3e42ef5719e70e82c
             
         #         if mask_detect <0:                    
         #             cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
         #         elif mask_detect > 0:
         #             cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
         
+        # visualize the video 
         cv2.imshow('mask', frame)
         #out.write(frame)
         if key==27:
