@@ -3,8 +3,8 @@ import cv2
 import argparse
 import logging
 from input_feeder import InputFeeder
-from faceDetection import FaceDetection
-from faceMaskDetection import MaskDetection
+# from faceDetection import FaceDetection
+# from faceMaskDetection import MaskDetection
 from personDetection import PersonDetect
 from safetyGear import GearDetect
 import time
@@ -26,10 +26,10 @@ def get_args():
     optional = parser.add_argument_group('optional arguments')
 
     # --create the arguments
-    optional.add_argument("-m_f", help="path to face detection model", default='./models/face-detection-adas-binary-0001')
-    optional.add_argument("-m_m", help="path to mask detection model", default='./models/face_mask')
-    optional.add_argument("-m_p", help="path to person detection model", default='./models/person_model_88')
- #   optional.add_argument("-m_g", help="path to safety gear detection model", default=None)
+    # optional.add_argument("-m_f", help="path to face detection model", default='./models/face-detection-adas-binary-0001')
+    # optional.add_argument("-m_m", help="path to mask detection model", default='./models/face_mask')
+    optional.add_argument("-m_p", help="path to person detection model", default='./models/person-detection-retail-0013/FP16/person-detection-retail-0013')
+    optional.add_argument("-m_g", help="path to safety gear detection model", default="./models/worker-safety-mobilenet/worker_safety_mobilenet")
 
     '''
     required.add_argument("-m_f",help="path to face detection model", required=True)
@@ -57,10 +57,10 @@ def pipelines(args):
     
     
     # grab the parsed parameters
-    faceDetectionModel=args.m_f
-    maskDetectionModel=args.m_m
+    # faceDetectionModel=args.m_f
+    # maskDetectionModel=args.m_m
     personDetectionModel=args.m_p
-  #  gearDetectionModel=args.m_g
+    gearDetectionModel=args.m_g
     device=args.d
     customLayers=args.l
     inputFile=args.i
@@ -77,27 +77,28 @@ def pipelines(args):
     # Create a video writer for the output video
     # The second argument should be `cv2.VideoWriter_fourcc('M','J','P','G')`
     # on Mac, and `0x00000021` on Linux
-    out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920,1080))    
+    out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920,1080)) 
+    # out = cv2.VideoWriter('out.mp4',0x00000021,10,(1920,1080))   
     
     # load feed data
     feed.load_data()
 
     # initialize and load the models
     ## load the face detection model 
-    faceDetectionPipeline=FaceDetection(faceDetectionModel, device, customLayers)
-    faceDetectionPipeline.load_model()
+    # faceDetectionPipeline=FaceDetection(faceDetectionModel, device, customLayers)
+    # faceDetectionPipeline.load_model()
 
     # load the face mask model
-    maskDetectionPipeline=MaskDetection(maskDetectionModel, device, customLayers)
-    maskDetectionPipeline.load_model()
+    # maskDetectionPipeline=MaskDetection(maskDetectionModel, device, customLayers)
+    # maskDetectionPipeline.load_model()
 
     # load the person detection model
     personDetectionPipeline=PersonDetect(personDetectionModel, device, customLayers)
     personDetectionPipeline.load_model()
 
     # load the hard hat and safety jacket    
-    #gearDetectionPipeline=GearDetect(gearDetectionModel, device, customLayers)
-    #gearDetectionPipeline.load_model()
+    gearDetectionPipeline=GearDetect(gearDetectionModel, device, customLayers)
+    gearDetectionPipeline.load_model()
     
 
      # set framecount, request_id, infer_handle variables
@@ -124,46 +125,89 @@ def pipelines(args):
             
             # Use the coordinates from personCoords to crop the person
             # personCoords is an array with the indexes giving x0,y0,x1,y1 respectively
-            
-
-
-            # feed the cropped person into the hard hat and safety vest model i.e. GearDetect
-             
-
-            # check if the coords gotten from the hard hat and safety vest model, i.e. GearDetect, is empty 
-            # as a means to check if someone is present with a hard hat or safety vest
-            
-                # if someone is with a safety kit, normalize the coords from the hard hat and safety vest model i.e. GearDetect 
-                # to that of the frame
-
-
-                # draw the coordinates of the kit on the person
-            
-            # draw the coordinates of the individual around the individual on the frame
-            # and label the person's compliance with either hard hat or vest
-
-            
-        faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
-        if faceFlag ==True:
-            for _ in faceCoords:
+            for _ in personCoords:
                 x0,y0,x1,y1=_
-
+                padding = 40
                 xmin = int(x0 * width)
                 ymin = int(y0 * height)
                 xmax = int(x1 * width)
                 ymax = int(y1 * height)
-                
-                croppedFace = frame[ymin:ymax,xmin:xmax]
-                # output frame for showing inferencing results 
-                #out_cv = frame.copy()
+                xmin = int(xmin - padding) if (xmin - padding) > 0 else 0
+                ymin = int(ymin - padding) if (ymin - padding) > 0 else 0
+                xmax = int(xmax + padding) if (xmax + padding) <  width else  width
+                ymax = int(ymax + padding) if (ymax + padding) <  height else  height
 
+                croppedperson = frame[ymin:ymax,xmin:xmax] 
                 cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-                mask_detect = maskDetectionPipeline.predict(croppedFace)
+
+                # feed the cropped person into the hard hat and safety vest model i.e. GearDetect
+                vest_flag, helment_flag, vest, helment = gearDetectionPipeline.predict(croppedperson)
+
+
+                # check if the coords gotten from the hard hat and safety vest model, i.e. GearDetect, is empty 
+                # as a means to check if someone is present with a hard hat or safety vest
+                
+                    # if someone is with a safety kit, normalize the coords from the hard hat and safety vest model i.e. GearDetect 
+                    # to that of the frame
+
+
+                    # draw the coordinates of the kit on the person
+                if vest_flag == True:
+                    for _ in vest:
+
+                        c_height = croppedperson.shape[0]
+                        c_width =croppedperson.shape[1]
+                        v_x0,v_y0,v_x1,v_y1=_
+                        xmin_v = int(v_x0 * c_width)
+                        ymin_v = int(v_y0 * c_height)
+                        xmax_v = int(v_x1 * c_width)
+                        ymax_v = int(v_y1 * c_height)
+
+                        
+                        cv2.rectangle(croppedperson, (xmin_v, ymin_v), (xmax_v, ymax_v), (0, 255, 0), 2)
+                        cv2.putText(croppedperson,"vest", (xmin_v +10, ymin_v-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+                        
+                if helment_flag == True:
+                    for _ in helment:
+
+                        c_height = croppedperson.shape[0]
+                        c_width =croppedperson.shape[1]
+                        h_x0,h_y0,h_x1,h_y1=_
+                        xmin_h = int(h_x0 * c_width)
+                        ymin_h = int(h_y0 * c_height)
+                        xmax_h = int(h_x1 * c_width)
+                        ymax_h = int(h_y1 * c_height)
+
+                        
+                        cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2)
+                        cv2.putText(croppedperson,"helment", (xmin_h +10, ymin_h-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+                # draw the coordinates of the individual around the individual on the frame
+                # and label the person's compliance with either hard hat or vest
+                        if vest_flag == True and helment_flag == True:
+                            cv2.putText(frame,"Full gear compliance", (xmin -10, ymin-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
+
             
-                if mask_detect <0:                    
-                    cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
-                elif mask_detect > 0:
-                    cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+        # faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
+        # if faceFlag ==True:
+        #     for _ in faceCoords:
+        #         x0,y0,x1,y1=_
+
+        #         xmin = int(x0 * width)
+        #         ymin = int(y0 * height)
+        #         xmax = int(x1 * width)
+        #         ymax = int(y1 * height)
+                
+        #         croppedFace = frame[ymin:ymax,xmin:xmax]
+        #         # output frame for showing inferencing results 
+        #         #out_cv = frame.copy()
+
+        #         cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+        #         mask_detect = maskDetectionPipeline.predict(croppedFace)
+            
+        #         if mask_detect <0:                    
+        #             cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
+        #         elif mask_detect > 0:
+        #             cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
         
         cv2.imshow('mask', frame)
         #out.write(frame)
