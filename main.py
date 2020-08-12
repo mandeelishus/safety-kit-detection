@@ -3,8 +3,8 @@ import cv2
 import argparse
 import logging
 from input_feeder import InputFeeder
-# from faceDetection import FaceDetection
-# from faceMaskDetection import MaskDetection
+from faceDetection import FaceDetection
+from faceMaskDetection import MaskDetection
 from personDetection import PersonDetect
 from safetyGear import GearDetect
 import time
@@ -26,8 +26,8 @@ def get_args():
     optional = parser.add_argument_group('optional arguments')
 
     # --create the arguments
-    # optional.add_argument("-m_f", help="path to face detection model", default='./models/face-detection-adas-binary-0001')
-    # optional.add_argument("-m_m", help="path to mask detection model", default='./models/face_mask')
+    optional.add_argument("-m_f", help="path to face detection model", default='./models/face-detection-adas-binary-0001')
+    optional.add_argument("-m_m", help="path to mask detection model", default='./models/face_mask')
     optional.add_argument("-m_p", help="path to person detection model", default='./models/person-detection-retail-0013/FP16/person-detection-retail-0013')
     optional.add_argument("-m_g", help="path to safety gear detection model", default="./models/worker-safety-mobilenet/worker_safety_mobilenet")
 
@@ -57,8 +57,8 @@ def pipelines(args):
     
     
     # grab the parsed parameters
-    # faceDetectionModel=args.m_f
-    # maskDetectionModel=args.m_m
+    faceDetectionModel=args.m_f
+    maskDetectionModel=args.m_m
     personDetectionModel=args.m_p
     gearDetectionModel=args.m_g
     device=args.d
@@ -77,7 +77,7 @@ def pipelines(args):
     # Create a video writer for the output video
     # The second argument should be `cv2.VideoWriter_fourcc('M','J','P','G')`
     # on Mac, and `0x00000021` on Linux
-    out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920,1080)) 
+    # out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920,1080)) 
     # out = cv2.VideoWriter('out.mp4',0x00000021,10,(1920,1080))   
     
     # load feed data
@@ -85,12 +85,12 @@ def pipelines(args):
 
     # initialize and load the models
     ## load the face detection model 
-    # faceDetectionPipeline=FaceDetection(faceDetectionModel, device, customLayers)
-    # faceDetectionPipeline.load_model()
+    faceDetectionPipeline=FaceDetection(faceDetectionModel, device, customLayers)
+    faceDetectionPipeline.load_model()
 
     # load the face mask model
-    # maskDetectionPipeline=MaskDetection(maskDetectionModel, device, customLayers)
-    # maskDetectionPipeline.load_model()
+    maskDetectionPipeline=MaskDetection(maskDetectionModel, device, customLayers)
+    maskDetectionPipeline.load_model()
 
     # load the person detection model
     personDetectionPipeline=PersonDetect(personDetectionModel, device, customLayers)
@@ -181,34 +181,8 @@ def pipelines(args):
                         
                         cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2)
                         cv2.putText(croppedperson,"helment", (xmin_h +10, ymin_h-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
-                # draw the coordinates of the individual around the individual on the frame
-                # and label the person's compliance with either hard hat or vest
-                        if vest_flag == True and helment_flag == True:
-                            cv2.putText(frame,"Full gear compliance", (xmin -10, ymin-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
 
-<<<<<<< HEAD
-            
-        # faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
-        # if faceFlag ==True:
-        #     for _ in faceCoords:
-        #         x0,y0,x1,y1=_
 
-        #         xmin = int(x0 * width)
-        #         ymin = int(y0 * height)
-        #         xmax = int(x1 * width)
-        #         ymax = int(y1 * height)
-||||||| merged common ancestors
-            
-        faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
-        if faceFlag ==True:
-            for _ in faceCoords:
-                x0,y0,x1,y1=_
-
-                xmin = int(x0 * width)
-                ymin = int(y0 * height)
-                xmax = int(x1 * width)
-                ymax = int(y1 * height)
-=======
         # send the frame to the face detection pipeline
         faceCoords, faceFlag=faceDetectionPipeline.predict(frame.copy())
         # if there is a face, obtain the coordinates of the face and send the face
@@ -221,40 +195,36 @@ def pipelines(args):
                 ymin = int(y0 * height)
                 xmax = int(x1 * width)
                 ymax = int(y1 * height)
->>>>>>> 5008b19125b36e21824b8ef3e42ef5719e70e82c
                 
-        #         croppedFace = frame[ymin:ymax,xmin:xmax]
+                croppedFace = frame[ymin:ymax,xmin:xmax]
         #         # output frame for showing inferencing results 
         #         #out_cv = frame.copy()
 
-<<<<<<< HEAD
-        #         cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-        #         mask_detect = maskDetectionPipeline.predict(croppedFace)
-||||||| merged common ancestors
-                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-                mask_detect = maskDetectionPipeline.predict(croppedFace)
-=======
                 # draw outlines of the face
                 cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
                 mask_detect = maskDetectionPipeline.predict(croppedFace)
->>>>>>> 5008b19125b36e21824b8ef3e42ef5719e70e82c
             
-        #         if mask_detect <0:                    
-        #             cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
-        #         elif mask_detect > 0:
-        #             cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+                if mask_detect <0:                    
+                    cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
+                elif mask_detect > 0:
+                    cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
         
+         # label the person's compliance 
+        # if vest_flag == True and helment_flag == True and mask_detect == True:
+        #     cv2.putText(frame,"Safety Compliance", (xmin -10, ymin-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+        
+
         # visualize the video 
         cv2.imshow('mask', frame)
         #out.write(frame)
-        if key==27:
+        if key & 0xFF == ord('q'):
             break
     
     
     
     logger.info("The End")
     cv2.destroyAllWindows()
-    out.release()
+    # out.release()
     feed.close()
     
 
