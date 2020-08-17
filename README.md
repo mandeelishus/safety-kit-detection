@@ -33,11 +33,11 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 
 ## Demo to Run the app
 ```
-python3 main.py -i <path to the input file>
--m_g <path to gear detection model IR file> 
--m_p <path to person detection model IR file> 
--m_f <path to face detection model IR file> 
--m_m <path to mask detection model IR file> 
+python3 main.py -i <path to the input file>\
+-m_g <path to gear detection model IR file> \
+-m_p <path to person detection model IR file>\ 
+-m_f <path to face detection model IR file> \
+-m_m <path to mask detection model IR file> \
 -d <specify device> 
 ```
 
