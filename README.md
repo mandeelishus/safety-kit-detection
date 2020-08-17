@@ -28,10 +28,14 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py --input_model <path to caffemodel file>  --input_proto <path to prototxt file>  -o <specify the output directory> 
 ```
  ## Directory Structure
+![Alt text](https://github.com/ajudges/mouseController/blob/master/bin/directorystructure.png)
 
-
-
-## Demo to Run the app
+## Demo to run the app
+First, initialize the Openvino environment by running the command below
+```
+source /opt/intel/openvino/bin/setupvars.sh
+```
+To capture from input path
 ```
 python3 main.py -i <path to the input file>\
 -m_g <path to gear detection model IR file> \
@@ -41,7 +45,6 @@ python3 main.py -i <path to the input file>\
 -d <specify device> 
 ```
 
-  
  ## Documentation
  The required command line arguments are:
 
