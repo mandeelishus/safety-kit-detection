@@ -8,7 +8,7 @@ This application is designed to detect if people are wearing safety-jackets, har
 ### Prerequisite
 - Openvino (You can run [this script](https://github.com/Tob-iee/OpenVINO_installation) to automate the installation of openvino)
 
-## Which model to use
+### Which model to use
 This application makes use of four models:
 
 - A preson detection model (person-detection-retail-0013 Intel® model), that can be downloaded using the model downloader. The model downloader generates and downloads the IR (the.xml and .bin files) that will be used by the application.
@@ -27,7 +27,7 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 ```
 python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py --input_model <path to caffemodel file>  --input_proto <path to prototxt file>  -o <specify the output directory> 
 ```
- ## Directory Structure
+## Directory Structure
  
 
 
