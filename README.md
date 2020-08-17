@@ -19,16 +19,17 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.p
 ```
 python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"
 ```
-- A safety gear detection model (the worker_safety_mobilenet model) , that can be downloaded directly from Openvino's website or from a git project by intel (here[this link](https://github.com/intel-iot-devkit/safety-gear-detector-python/blob/master/resources/worker-safety-mobilenet), where it's Caffe* model file are provided. These are then passed through Openvino's model optimizer to generate the IR (the .xml and .bin files) that will be used by the application.
+- A safety gear detection model (the worker_safety_mobilenet model) , that can be downloaded directly from Openvino's website or from a git project by intel ([link](https://github.com/intel-iot-devkit/safety-gear-detector-python/blob/master/resources/worker-safety-mobilenet), where it's Caffe* model file are provided. These are then passed through Openvino's model optimizer to generate the IR (the .xml and .bin files) that will be used by the application.
 ```
 python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py --input_model <path to caffemodel file>  --input_proto <path to prototxt file>  -o <specify the output directory>  
 ```
-- A mask detection model (made by DiDi), which can be downloaded from DiDi's mask dietection git repo(here[this link](https://github.com/didi/maskdetection/tree/master/model), where it's Caffe* model file are provided. These are then passed through Openvino's model optimizer to generate the IR (the .xml and .bin files) that will be used by the application.
+- A mask detection model (made by DiDi), which can be downloaded from DiDi's mask dietection git repo([link](https://github.com/didi/maskdetection/tree/master/model), where it's Caffe* model file are provided. These are then passed through Openvino's model optimizer to generate the IR (the .xml and .bin files) that will be used by the application.
 ```
 python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py --input_model <path to caffemodel file>  --input_proto <path to prototxt file>  -o <specify the output directory> 
 ```
  ## Directory Structure
-![Alt text](https://github.com/ajudges/mouseController/blob/master/bin/directorystructure.png)
+ 
+
 
 ## Demo to run the app
 First, initialize the Openvino environment by running the command below
