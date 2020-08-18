@@ -56,7 +56,7 @@ class GearDetect(Model_X):
         for box in result[0][0]:
 
             conf = box[2]
-            if (conf > 0.6):
+            if (conf > 0.7):
 
                 # Detect safety vest
                 if (int(box[1])) == 2:

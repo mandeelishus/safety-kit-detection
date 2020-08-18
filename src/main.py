@@ -11,7 +11,7 @@ import time
 import os
 
 CPU_EXTENSION="/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so"
-performance_directory_path="../"
+
 logging.basicConfig(filename='safety.log', level=logging.DEBUG)
 
 def get_args():
@@ -42,20 +42,11 @@ def get_args():
     optional.add_argument("-l", help="MKLDNN (CPU)-targeted custom layers.", default=CPU_EXTENSION, required=False)
     optional.add_argument("-d", help="Specify the target device type", default='CPU')
     optional.add_argument("-p", help="path to store performance stats", required=False)
-    optional.add_argument("-ps", help="specify flags from m_g, m_m, (select a prediction flag)", default='3')
+    optional.add_argument("-ps", help="specify flags from 1, 2, (select a prediction flag)", default='3')
 
     args = parser.parse_args()
     return args
 
-def switch(predmode):
-    switcher = {
-        "1": "gearpredict",
-        "2": "maskpredict",
-        "3": ["gearpredict", "maskpredict"]
-    }
-
-    func = switcher.get(predmode,'Invalid')
-    return func
 
 # pred_switch = args.ps
 def pipelines(args):
@@ -117,8 +108,6 @@ def pipelines(args):
      # set framecount, request_id, infer_handle variables
     frameCount = 0
 
-    print(switch(pred_switch)) 
-
     # collate frames from the feeder and feed into the detection pipelines
     for _, frame in feed.next_batch():
         if not _:
@@ -153,54 +142,50 @@ def pipelines(args):
                 ymax = int(ymax + padding) if (ymax + padding) <  height else  height
 
                 croppedperson = frame[ymin:ymax,xmin:xmax] 
-                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (255, 255, 255), 2)
 
+                c_height = croppedperson.shape[0]
+                c_width =croppedperson.shape[1]
 
+                detection_list = []
                 if pred_switch == "1" or pred_switch == "3":
-
                     # feed the cropped person into the hard hat and safety vest model i.e. GearDetect
-                    vest_flag, helment_flag, vest, helment = gearDetectionPipeline.predict(croppedperson)
-
+                    vest_flag, helment_flag, vest, helment = gearDetectionPipeline.predict(croppedperson.copy())
 
                     # check if the coords gotten from the hard hat and safety vest model, i.e. GearDetect, is empty 
                     # as a means to check if someone is present with a hard hat or safety vest
                     
-                        # if someone is with a safety kit, normalize the coords from the hard hat and safety vest model i.e. GearDetect 
-                        # to that of the frame
+                        # if someone is with a safety kit, normalize the coords and append it to the detction list
+                            # Using ths coordinates of the kit on the person 
+                            # draw and label the person's compliance with either hard hat or vest
+                    for _ in helment:
+                        h_x0,h_y0,h_x1,h_y1=_
+                        xmin_h = int(h_x0 * c_width)
+                        ymin_h = int(h_y0 * c_height)
+                        xmax_h = int(h_x1 * c_width)
+                        ymax_h = int(h_y1 * c_height)
+                        if vest_flag == True:
+                            logger.info("vest detected")
+                            cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2)
+
+                    for _ in vest:
+                        v_x0,v_y0,v_x1,v_y1=_
+                        xmin_v = int(v_x0 * c_width)
+                        ymin_v = int(v_y0 * c_height)
+                        xmax_v = int(v_x1 * c_width)
+                        ymax_v = int(v_y1 * c_height)
+                        
+                        if vest_flag == True:
+                            logger.info("gear detected")
+                            cv2.rectangle(croppedperson, (xmin_v, ymin_v), (xmax_v, ymax_v), (0, 255, 0), 2)
 
 
-                        # Using ths coordinates of the kit on the person 
-                        # draw and label the person's compliance with either hard hat or vest
-                    if vest_flag == True:
-                        for _ in vest:
 
-                            c_height = croppedperson.shape[0]
-                            c_width =croppedperson.shape[1]
-                            v_x0,v_y0,v_x1,v_y1=_
-                            xmin_v = int(v_x0 * c_width)
-                            ymin_v = int(v_y0 * c_height)
-                            xmax_v = int(v_x1 * c_width)
-                            ymax_v = int(v_y1 * c_height)
+                    # cv2.putText(croppedperson,"vest", (_rect[0], _rect[2]), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
 
-                            
-                            cv2.rectangle(croppedperson, (xmin_v, ymin_v), (xmax_v, ymax_v), (0, 255, 0), 2),
-                            cv2.putText(croppedperson,"vest", (xmin_v +10, ymin_v-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
-                            
-                    if helment_flag == True:
-                        for _ in helment:
-
-                            c_height = croppedperson.shape[0]
-                            c_width =croppedperson.shape[1]
-                            h_x0,h_y0,h_x1,h_y1=_
-                            xmin_h = int(h_x0 * c_width)
-                            ymin_h = int(h_y0 * c_height)
-                            xmax_h = int(h_x1 * c_width)
-                            ymax_h = int(h_y1 * c_height)
-
-                            
-                            cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2),
-                            cv2.putText(croppedperson,"helment", (xmin_h +10, ymin_h-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
-                # draw the coordinates of the individual around the individual on the frame
+                #         cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2),
+                #         cv2.putText(croppedperson,"helment", (xmin_h +10, ymin_h-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
+                # # draw the coordinates of the individual around the individual on the frame
                 # if vest_flag == True and helment_flag == True:
                 #     cv2.putText(frame,"Full gear compliance", (xmin -10, ymin-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
 
@@ -215,30 +200,29 @@ def pipelines(args):
                 for _ in faceCoords:
                     x0,y0,x1,y1=_
 
-                    xmin = int(x0 * width)
-                    ymin = int(y0 * height)
-                    xmax = int(x1 * width)
-                    ymax = int(y1 * height)
+                    xmin_m = int((x0 * width)-10)
+                    ymin_m = int((y0 * height)-5)
+                    xmax_m = int((x1 * width))
+                    ymax_m = int((y1 * height)-10)
                     
-                    croppedFace = frame[ymin:ymax,xmin:xmax]
+                    croppedFace = frame[ymin_m:ymax_m,xmin_m:xmax_m]
                     # output frame for showing inferencing results 
                     # out_cv = frame.copy()
 
-                    # draw outlines of the face
-                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-                    mask_detect = maskDetectionPipeline.predict(croppedFace)
+                    # # draw outlines of the face
+                    cv2.rectangle(frame, (xmin_m, ymin_m), (xmax_m, ymax_m), (255, 255, 255), 2)
+                    mask_detect = maskDetectionPipeline.predict(croppedFace.copy())
                 
-                    if mask_detect <0:                    
-                        cv2.putText(frame,"No mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
+                    if mask_detect < 0:                    
+                        cv2.putText(frame,"No mask detected", (xmin_m -2, ymin_m), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
                     elif mask_detect > 0:
-                        cv2.putText(frame,"Mask detected", (xmin -2, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
-
+                        logger.info("mask detected")
+                        cv2.putText(frame,"Mask detected", (xmin_m -2, ymin_m), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
         
         
         # visualize the video
-        # print(switch(pred_switch)) 
         cv2.imshow('mask', frame)
-        #out.write(frame)
+        # out.write(frame)
         if key & 0xFF == ord('q'):
             break
     
@@ -251,9 +235,8 @@ def pipelines(args):
 
 def main():
     args=get_args()
-    # switch(pred_switch)
     pipelines(args)
-    # pred_switch = args.ps
+
     
 
 if __name__ == '__main__':
