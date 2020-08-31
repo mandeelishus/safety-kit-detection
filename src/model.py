@@ -114,5 +114,5 @@ class Model_X:
             curr_image = curr_image.transpose((2,0,1))
             curr_image = curr_image.reshape(1,*curr_image.shape)
         except Exception as e:
-            print(str(e))
+            self.logger.info(str(e))
         return curr_image
