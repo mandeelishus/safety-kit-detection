@@ -29,7 +29,7 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 ```
 ## Directory Structure
  
-
+![Alt text](https://github.com)
 
 ## Demo to run the app
 First, initialize the Openvino environment by running the command below
