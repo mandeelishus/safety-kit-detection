@@ -3,6 +3,7 @@ This application is designed to detect if people are wearing safety-jackets, har
 
 ### Demo video of running the app
 
+[![demo video](https://img.youtube.com/vi/jay0QTJs3EI/0.jpg)](https://youtu.be/jay0QTJs3EI)
 
 ## Guide for running the app
 ### Prerequisite
