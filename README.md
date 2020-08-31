@@ -30,7 +30,7 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 ```
 ## Directory Structure
  
-![Alt text](https://github.com)
+![Alt text](https://github.com/mandeelishus/safety-kit-detection/bin/directory_structure.png)
 
 ## Demo to run the app
 First, initialize the Openvino environment by running the command below
