@@ -82,7 +82,8 @@ def pipelines(args):
     # The second argument should be `cv2.VideoWriter_fourcc('M','J','P','G')`
     # on Mac, and `0x00000021` on Linux
     # out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920,1080)) 
-    # out = cv2.VideoWriter('out.mp4',0x00000021,10,(1920,1080))   
+    # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    # out = cv2.VideoWriter('out.mp4',fourcc,10,(1920,1080))   
     
     # load feed data
     feed.load_data()
@@ -167,6 +168,7 @@ def pipelines(args):
                         if vest_flag == True:
                             logger.info("vest detected")
                             cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2)
+                            # cv2.putText(croppedperson,"helment", (xmin_h-2, ymin_h), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
 
                     for _ in vest:
                         v_x0,v_y0,v_x1,v_y1=_
@@ -178,16 +180,7 @@ def pipelines(args):
                         if vest_flag == True:
                             logger.info("gear detected")
                             cv2.rectangle(croppedperson, (xmin_v, ymin_v), (xmax_v, ymax_v), (0, 255, 0), 2)
-
-
-
-                    # cv2.putText(croppedperson,"vest", (_rect[0], _rect[2]), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
-
-                #         cv2.rectangle(croppedperson, (xmin_h, ymin_h), (xmax_h, ymax_h), (0, 255, 0), 2),
-                #         cv2.putText(croppedperson,"helment", (xmin_h +10, ymin_h-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
-                # # draw the coordinates of the individual around the individual on the frame
-                # if vest_flag == True and helment_flag == True:
-                #     cv2.putText(frame,"Full gear compliance", (xmin -10, ymin-5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,0,255),1)
+                            # cv2.putText(croppedperson,"vest", (xmin_v-2, ymin_v), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0),1)
 
 
         if pred_switch == "2" or pred_switch == "3":
