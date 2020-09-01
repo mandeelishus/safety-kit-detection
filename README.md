@@ -7,7 +7,7 @@ This application is designed to detect if people are wearing safety-jackets, har
 
 ### Demo picture of mask detection
 
-![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/mask_detection_demo.png)
+![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/master/bin/mask_detection_demo.png)
 
 ## Guide for running the app
 ### Prerequisite
@@ -34,7 +34,7 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 ```
 ## Directory Structure
  
-![Alt text](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/directory_structure.png)
+![Alt text](https://github.com/mandeelishus/safety-kit-detection/blob/master/bin/directory_structure.png)
 
 ## Demo to run the app
 First, initialize the Openvino environment by running the command below
