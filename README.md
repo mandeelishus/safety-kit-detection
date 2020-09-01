@@ -50,15 +50,15 @@ python3 main.py -i <path to the input file>\
  ## Documentation
  The required command line arguments are:
 
--i, which can either be the path of the input video or ```cam``` for camera
+-input_file, which can either be the path of the input video or ```cam``` for camera
 
--m_g, path to gear detection model
+-gear_model, path to gear detection model
   
--m_p, path to person detection model
+-person_model, path to person detection model
   
--m_f, path to face detection model
+-face_model, path to face detection model
   
--m_m, path to mask detection model
+-mask_model, path to mask detection model
 
 The optional command line arguments are:
 
