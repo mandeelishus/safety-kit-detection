@@ -69,3 +69,7 @@ The optional command line arguments are:
 -p, path (in the cloned directory) to store performance statistics i.e. inference time, fps, and model loading time.
 
 -ps, specify detector flags, i.e either (1, 2 or 3) to switch between the gear detector, mask detector or use both respectively
+
+
+## Observation
+When trying to make detection, the angle of the camera to is very important in other to make correct prediction and also an enviroment with good lighting is required for the mask detection model to work properly
