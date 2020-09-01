@@ -50,16 +50,16 @@ python3 main.py -i <path to the input file>\
  ## Documentation
  The required command line arguments are:
 
--input_file, which can either be the path of the input video or ```cam``` for camera
+-i input_file, which can either be the path of the input video or ```cam``` for camera
 
--gear_model, path to gear detection model
+-m_g gear_model, path to gear detection model
   
--person_model, path to person detection model
+-m_p person_model, path to person detection model
   
--face_model, path to face detection model
+-m_f face_model, path to face detection model
   
--mask_model, path to mask detection model
-
+-m_m mask_model, path to mask detection model
+ 
 The optional command line arguments are:
 
 -l, path for MKLDNN (CPU)-targeted custom layers
