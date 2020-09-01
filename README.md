@@ -5,6 +5,10 @@ This application is designed to detect if people are wearing safety-jackets, har
 
 [![demo video](https://img.youtube.com/vi/jay0QTJs3EI/0.jpg)](https://youtu.be/jay0QTJs3EI)
 
+### Demo picture of mask detection
+
+[![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/mask_detection_demo.png)
+
 ## Guide for running the app
 ### Prerequisite
 - Openvino (You can run [this script](https://github.com/Tob-iee/OpenVINO_installation) to automate the installation of openvino)
