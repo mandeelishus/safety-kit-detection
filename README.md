@@ -7,7 +7,7 @@ This application is designed to detect if people are wearing safety-jackets, har
 
 ### Demo picture of mask detection
 
-[![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/mask_detection_demo.png)
+[![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/mask_detection_demo.png)]
 
 ## Guide for running the app
 ### Prerequisite
