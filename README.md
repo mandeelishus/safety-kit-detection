@@ -76,4 +76,4 @@ The optional command line arguments are:
 
 
 ## Observation
-When trying to make detection, the angle of the camera to is very important in other to make correct prediction and also an enviroment with good lighting is required for the mask detection model to work properly
+When trying to make detection, the angle of the camera is very important in order to make correct prediction and also an enviroment with good lighting is required for the mask detection model to work properly.
