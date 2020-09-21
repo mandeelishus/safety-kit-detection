@@ -43,7 +43,7 @@ source /opt/intel/openvino/bin/setupvars.sh
 ```
 To capture from input path
 ```
-python3 main.py -i <path to the input file>\
+python3 src/main.py -i <path to the input file>\
 -m_g <path to gear detection model IR file> \
 -m_p <path to person detection model IR file>\ 
 -m_f <path to face detection model IR file> \
