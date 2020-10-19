@@ -1,5 +1,5 @@
 # safety-kit-detection
-This application is designed to detect if people are wearing safety-jackets, hard-hats and a face mask. It's use cuts across different applications such as checking the safety complicance of workers on a site  as to wearing their full safety gear(vest and helment) and also safety compliance of people wearing a face mask as a preventive measure due to the coronavirus or andy other use case of a face mask.
+This application is designed to detect if people are wearing safety-jackets, hard-hats and a face mask. It's use cuts across different applications such as checking the safety complicance of workers on a site  as to wearing their full safety gear(vest and helment) and also safety compliance of people wearing a face mask as a preventive measure due to the coronavirus or any other use case of a face mask.
 
 ### Demo video of running the app
 
@@ -7,7 +7,7 @@ This application is designed to detect if people are wearing safety-jackets, har
 
 ### Demo picture of mask detection
 
-![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/mask_detection_demo.png)
+![demo picture](https://github.com/mandeelishus/safety-kit-detection/blob/master/bin/mask_detection_demo.png)
 
 ## Guide for running the app
 ### Prerequisite
@@ -34,7 +34,7 @@ python3 /opt/intel/openvino/deployment_tools/tools/model_optimizer/mo_caffe.py -
 ```
 ## Directory Structure
  
-![Alt text](https://github.com/mandeelishus/safety-kit-detection/blob/tobe/bin/directory_structure.png)
+![Alt text](https://github.com/mandeelishus/safety-kit-detection/blob/master/bin/directory_structure.png)
 
 ## Demo to run the app
 First, initialize the Openvino environment by running the command below
@@ -76,4 +76,4 @@ The optional command line arguments are:
 
 
 ## Observation
-When trying to make detection, the angle of the camera to is very important in other to make correct prediction and also an enviroment with good lighting is required for the mask detection model to work properly
+When trying to make detection, the angle of the camera is very important in order to make correct prediction and also an enviroment with good lighting is required for the mask detection model to work properly.
