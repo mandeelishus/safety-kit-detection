@@ -16,4 +16,4 @@ COPY . .
 
 RUN echo "/bin/bash -c 'source /opt/intel/openvino/bin/setupvars.sh'" >> /root/.bashrc
 
-CMD [ "python3", "python3 src/main.py -i 0 -m_g ./models/safety_model/worker_safety_mobilenet -m_p ./models/person_model/FP16/person-detection-retail-0013 -m_f ./models/face_model/face-detection-adas-binary-0001 -m_m ./models/mask_model/face_mask -d CPU -l 0.6" ]
+CMD [ "python3", "src/main.py -i 0 -m_g ./models/safety_model/worker_safety_mobilenet -m_p ./models/person_model/FP16/person-detection-retail-0013 -m_f ./models/face_model/face-detection-adas-binary-0001 -m_m ./models/mask_model/face_mask -d CPU -l 0.6" ]
