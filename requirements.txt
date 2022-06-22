@@ -1,4 +1,4 @@
 setuptools~=50.3.0
-numpy==1.16.6
+numpy==1.22.0
 opencv_python==4.2.0.32
 azure-iot-device~=2.2.0
